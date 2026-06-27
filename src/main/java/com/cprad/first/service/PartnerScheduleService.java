@@ -2,6 +2,7 @@ package com.cprad.first.service;
 
 import com.cprad.first.dto.PartnerRequest;
 import com.cprad.first.dto.ScheduleRequest;
+import com.cprad.first.dto.ScheduleResponse;
 import com.cprad.first.entity.BusinessPartnerEntity;
 import com.cprad.first.entity.PartnerScheduleEntity;
 import com.cprad.first.repository.BusinessPartnerRepository;
@@ -58,7 +59,19 @@ public class PartnerScheduleService {
         return registerSchedule(request);
     }
 
-    public List<PartnerScheduleEntity> getValidSchedulesByDate(String action, LocalDate date) {
-        return scheduleRepository.findValidSchedulesByDate(action, date);
+    @Transactional(readOnly = true)
+    public List<ScheduleResponse> getValidSchedulesByDate(String action, LocalDate date) {
+        List<PartnerScheduleEntity> schedules = scheduleRepository.findValidSchedulesByDate(action, date);
+        return schedules.stream()
+                .map(entity -> new ScheduleResponse(
+                        entity.getId(),
+                        entity.getAction(),
+                        entity.getPartner().getId(),
+                        entity.getPartner().getName(),
+                        entity.getFrequency(),
+                        entity.getDay(),
+                        entity.getIsActive()
+                ))
+                .toList();
     }
 }

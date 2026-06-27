@@ -5,4 +5,5 @@ public record ScheduleRequest(
         Long partnerId,
         String frequency,
         Integer day
-) {}
+) {
+}
