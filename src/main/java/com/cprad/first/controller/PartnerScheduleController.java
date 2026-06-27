@@ -59,4 +59,13 @@ public class PartnerScheduleController {
         List<ScheduleResponse> validSchedules = scheduleService.getValidSchedulesByDate(action, date);
         return ResponseEntity.ok(validSchedules);
     }
+
+    @PostMapping("/schedules/run")
+    public ResponseEntity<String> runInvoiceBatch(
+            @RequestParam String action,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        scheduleService.runDailyInvoiceBatch(action, date);
+        return ResponseEntity.ok("Batch process triggered successfully! Messages sent to Kafka.");
+    }
 }

@@ -7,6 +7,7 @@ import com.cprad.first.entity.BusinessPartnerEntity;
 import com.cprad.first.entity.PartnerScheduleEntity;
 import com.cprad.first.repository.BusinessPartnerRepository;
 import com.cprad.first.repository.PartnerScheduleRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,12 @@ import java.util.List;
 public class PartnerScheduleService {
     private final BusinessPartnerRepository partnerRepository;
     private final PartnerScheduleRepository scheduleRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public PartnerScheduleService(BusinessPartnerRepository partnerRepository, PartnerScheduleRepository scheduleRepository) {
+    public PartnerScheduleService(BusinessPartnerRepository partnerRepository, PartnerScheduleRepository scheduleRepository, KafkaTemplate<String, String> kafkaTemplate) {
         this.partnerRepository = partnerRepository;
         this.scheduleRepository = scheduleRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Transactional
@@ -73,5 +76,17 @@ public class PartnerScheduleService {
                         entity.getIsActive()
                 ))
                 .toList();
+    }
+
+    public void runDailyInvoiceBatch(String action, LocalDate date) {
+        List<PartnerScheduleEntity> validSchedules = scheduleRepository.findValidSchedulesByDate(action, date);
+
+        for (PartnerScheduleEntity schedule : validSchedules) {
+            String partnerIdMessage = schedule.getPartner().getId().toString();
+
+            kafkaTemplate.send("invoice-topic", partnerIdMessage);
+
+            System.out.println("========== [PRODUCER] Success push Partner ID " + partnerIdMessage + " to Kafka Topic ==========");
+        }
     }
 }
