@@ -1,5 +1,7 @@
 package com.cprad.first.dto;
 
+import java.io.Serializable;
+
 public record ScheduleResponse(
         Long id,
         String action,
@@ -8,5 +10,5 @@ public record ScheduleResponse(
         String frequency,
         Integer day,
         Boolean isActive
-) {
+) implements Serializable {
 }

@@ -7,6 +7,8 @@ import com.cprad.first.entity.BusinessPartnerEntity;
 import com.cprad.first.entity.PartnerScheduleEntity;
 import com.cprad.first.repository.BusinessPartnerRepository;
 import com.cprad.first.repository.PartnerScheduleRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ public class PartnerScheduleService {
         return partnerRepository.save(partner);
     }
 
+    @CacheEvict(value = "valid-schedules", allEntries = true)
     @Transactional
     public PartnerScheduleEntity registerSchedule(ScheduleRequest request) {
         BusinessPartnerEntity partner = partnerRepository.findById(request.partnerId())
@@ -49,6 +52,7 @@ public class PartnerScheduleService {
         return scheduleRepository.save(schedule);
     }
 
+    @CacheEvict(value = "valid-schedules", allEntries = true)
     @Transactional
     public PartnerScheduleEntity updateSchedule(Long oldScheduleId, ScheduleRequest request) {
         PartnerScheduleEntity oldSchedule = scheduleRepository.findById(oldScheduleId)
@@ -62,8 +66,10 @@ public class PartnerScheduleService {
         return registerSchedule(request);
     }
 
+    @Cacheable(value = "valid-schedules", key = "#action + '_' + #date.toString()")
     @Transactional(readOnly = true)
     public List<ScheduleResponse> getValidSchedulesByDate(String action, LocalDate date) {
+        System.out.println("Read Database, Not using Cache...");
         List<PartnerScheduleEntity> schedules = scheduleRepository.findValidSchedulesByDate(action, date);
         return schedules.stream()
                 .map(entity -> new ScheduleResponse(
