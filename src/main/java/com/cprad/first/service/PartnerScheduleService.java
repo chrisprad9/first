@@ -1,0 +1,64 @@
+package com.cprad.first.service;
+
+import com.cprad.first.dto.PartnerRequest;
+import com.cprad.first.dto.ScheduleRequest;
+import com.cprad.first.entity.BusinessPartnerEntity;
+import com.cprad.first.entity.PartnerScheduleEntity;
+import com.cprad.first.repository.BusinessPartnerRepository;
+import com.cprad.first.repository.PartnerScheduleRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class PartnerScheduleService {
+    private final BusinessPartnerRepository partnerRepository;
+    private final PartnerScheduleRepository scheduleRepository;
+
+    public PartnerScheduleService(BusinessPartnerRepository partnerRepository, PartnerScheduleRepository scheduleRepository) {
+        this.partnerRepository = partnerRepository;
+        this.scheduleRepository = scheduleRepository;
+    }
+
+    @Transactional
+    public BusinessPartnerEntity registerPartner(PartnerRequest request) {
+        BusinessPartnerEntity partner = new BusinessPartnerEntity();
+        partner.setName(request.name());
+        partner.setStatus("ACTIVE");
+        return partnerRepository.save(partner);
+    }
+
+    @Transactional
+    public PartnerScheduleEntity registerSchedule(ScheduleRequest request) {
+        BusinessPartnerEntity partner = partnerRepository.findById(request.partnerId())
+                .orElseThrow(() -> new RuntimeException("Partner not found with ID: " + request.partnerId()));
+
+        PartnerScheduleEntity schedule = new PartnerScheduleEntity();
+        schedule.setAction(request.action());
+        schedule.setPartner(partner);
+        schedule.setFrequency(request.frequency());
+        schedule.setDay(request.day());
+        schedule.setIsActive(true);
+
+        return scheduleRepository.save(schedule);
+    }
+
+    @Transactional
+    public PartnerScheduleEntity updateSchedule(Long oldScheduleId, ScheduleRequest request) {
+        PartnerScheduleEntity oldSchedule = scheduleRepository.findById(oldScheduleId)
+                .orElseThrow(() -> new RuntimeException("Schedule not found with ID: " + oldScheduleId));
+
+        // Soft delete
+        oldSchedule.setIsActive(false);
+        scheduleRepository.save(oldSchedule);
+
+        // Create new
+        return registerSchedule(request);
+    }
+
+    public List<PartnerScheduleEntity> getValidSchedulesByDate(String action, LocalDate date) {
+        return scheduleRepository.findValidSchedulesByDate(action, date);
+    }
+}
