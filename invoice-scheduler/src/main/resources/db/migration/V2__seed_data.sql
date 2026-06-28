@@ -1,15 +1,17 @@
 -- V2__seed_data.sql
 
 -- 1. Insert Data Master Business Partner
-INSERT INTO business_partner (name, status) VALUES
-        ('PT Teknologi Maju', 'ACTIVE'),
-        ('CV Sumber Makmur', 'ACTIVE'),
-        ('Global Trade Corp', 'ACTIVE'),
-        ('Toko Kelontong Sukses', 'INACTIVE'); -- Partner non-aktif untuk ngetes filter
+INSERT INTO business_partner (name, status)
+VALUES ('PT Teknologi Maju', 'ACTIVE'),
+       ('CV Sumber Makmur', 'ACTIVE'),
+       ('Global Trade Corp', 'ACTIVE'),
+       ('Toko Kelontong Sukses', 'INACTIVE');
+-- Partner non-aktif untuk ngetes filter
 
 -- 2. Insert Data Schedule Invoice untuk masing-masing Partner
 -- Kita pakai action 'SEND_INVOICE' sesuai kebutuhan index kamu
-INSERT INTO partner_schedule (action, partner_id, frequency, day, is_active) VALUES
+INSERT INTO partner_schedule (action, partner_id, frequency, day, is_active)
+VALUES
 -- PT Teknologi Maju: Tagihan mingguan setiap hari Selasa (2)
 ('SEND_INVOICE', 1, 'WEEKLY', 2, true),
 

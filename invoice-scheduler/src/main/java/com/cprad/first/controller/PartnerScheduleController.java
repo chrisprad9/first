@@ -1,10 +1,9 @@
 package com.cprad.first.controller;
 
 import com.cprad.first.dto.PartnerRequest;
+import com.cprad.first.dto.PartnerResponse;
 import com.cprad.first.dto.ScheduleRequest;
 import com.cprad.first.dto.ScheduleResponse;
-import com.cprad.first.entity.BusinessPartnerEntity;
-import com.cprad.first.entity.PartnerScheduleEntity;
 import com.cprad.first.service.PartnerScheduleService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -26,26 +25,26 @@ public class PartnerScheduleController {
     // 1. Endpoint Register Business Partner
     // POST http://localhost:8080/api/v1/partners
     @PostMapping("/partners")
-    public ResponseEntity<BusinessPartnerEntity> registerPartner(@RequestBody PartnerRequest request) {
-        BusinessPartnerEntity partner = scheduleService.registerPartner(request);
+    public ResponseEntity<PartnerResponse> registerPartner(@RequestBody PartnerRequest request) {
+        PartnerResponse partner = scheduleService.registerPartner(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(partner);
     }
 
     // 2. Endpoint Register Schedule
     // POST http://localhost:8080/api/v1/schedules
     @PostMapping("/schedules")
-    public ResponseEntity<PartnerScheduleEntity> registerSchedule(@RequestBody ScheduleRequest request) {
-        PartnerScheduleEntity schedule = scheduleService.registerSchedule(request);
+    public ResponseEntity<ScheduleResponse> registerSchedule(@RequestBody ScheduleRequest request) {
+        ScheduleResponse schedule = scheduleService.registerSchedule(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(schedule);
     }
 
     // 3. Endpoint Update Schedule (Deactivate Old + Create New)
     // PUT http://localhost:8080/api/v1/schedules/{id}
     @PutMapping("/schedules/{id}")
-    public ResponseEntity<PartnerScheduleEntity> updateSchedule(
+    public ResponseEntity<ScheduleResponse> updateSchedule(
             @PathVariable Long id,
             @RequestBody ScheduleRequest request) {
-        PartnerScheduleEntity updatedSchedule = scheduleService.updateSchedule(id, request);
+        ScheduleResponse updatedSchedule = scheduleService.updateSchedule(id, request);
         return ResponseEntity.ok(updatedSchedule);
     }
 

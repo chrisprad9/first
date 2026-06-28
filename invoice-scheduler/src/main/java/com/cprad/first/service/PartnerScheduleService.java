@@ -1,6 +1,7 @@
 package com.cprad.first.service;
 
 import com.cprad.first.dto.PartnerRequest;
+import com.cprad.first.dto.PartnerResponse;
 import com.cprad.first.dto.ScheduleRequest;
 import com.cprad.first.dto.ScheduleResponse;
 import com.cprad.first.entity.BusinessPartnerEntity;
@@ -29,16 +30,22 @@ public class PartnerScheduleService {
     }
 
     @Transactional
-    public BusinessPartnerEntity registerPartner(PartnerRequest request) {
+    public PartnerResponse registerPartner(PartnerRequest request) {
         BusinessPartnerEntity partner = new BusinessPartnerEntity();
         partner.setName(request.name());
         partner.setStatus("ACTIVE");
-        return partnerRepository.save(partner);
+
+        BusinessPartnerEntity saved = partnerRepository.save(partner);
+        return new PartnerResponse(
+                saved.getId(),
+                saved.getName(),
+                saved.getStatus()
+        );
     }
 
     @CacheEvict(value = "valid-schedules", allEntries = true)
     @Transactional
-    public PartnerScheduleEntity registerSchedule(ScheduleRequest request) {
+    public ScheduleResponse registerSchedule(ScheduleRequest request) {
         BusinessPartnerEntity partner = partnerRepository.findById(request.partnerId())
                 .orElseThrow(() -> new RuntimeException("Partner not found with ID: " + request.partnerId()));
 
@@ -49,12 +56,22 @@ public class PartnerScheduleService {
         schedule.setDay(request.day());
         schedule.setIsActive(true);
 
-        return scheduleRepository.save(schedule);
+        PartnerScheduleEntity saved = scheduleRepository.save(schedule);
+
+        return new ScheduleResponse(
+                saved.getId(),
+                saved.getAction(),
+                saved.getPartner().getId(),
+                saved.getPartner().getName(),
+                saved.getFrequency(),
+                saved.getDay(),
+                saved.getIsActive()
+        );
     }
 
     @CacheEvict(value = "valid-schedules", allEntries = true)
     @Transactional
-    public PartnerScheduleEntity updateSchedule(Long oldScheduleId, ScheduleRequest request) {
+    public ScheduleResponse updateSchedule(Long oldScheduleId, ScheduleRequest request) {
         PartnerScheduleEntity oldSchedule = scheduleRepository.findById(oldScheduleId)
                 .orElseThrow(() -> new RuntimeException("Schedule not found with ID: " + oldScheduleId));
 

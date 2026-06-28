@@ -39,7 +39,6 @@ Open a new terminal window or tab, navigate to the scheduler sub-project directo
 ```bash
 cd invoice-scheduler
 ./gradlew bootRun
-cd ..
 ```
 *This service will bind to port `8080` and automatically execute database schema migrations via Flyway.*
 
@@ -48,7 +47,6 @@ Open another terminal window or tab, navigate to the executor sub-project direct
 ```bash
 cd invoice-executor
 ./gradlew bootRun
-cd ..
 ```
 *This service will bind to port `8081` and immediately start listening for events from the Kafka Topic.*
 
