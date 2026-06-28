@@ -92,7 +92,7 @@ public class PartnerScheduleService {
 
             kafkaTemplate.send("invoice-topic", partnerIdMessage);
 
-            System.out.println("========== [PRODUCER] Success push Partner ID " + partnerIdMessage + " to Kafka Topic ==========");
+            System.out.println("[PRODUCER] Success push Partner ID " + partnerIdMessage + " to Kafka Topic.");
         }
     }
 }

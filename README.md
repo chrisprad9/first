@@ -39,6 +39,7 @@ Open a new terminal window or tab, navigate to the scheduler sub-project directo
 ```bash
 cd invoice-scheduler
 ./gradlew bootRun
+cd ..
 ```
 *This service will bind to port `8080` and automatically execute database schema migrations via Flyway.*
 
@@ -47,6 +48,7 @@ Open another terminal window or tab, navigate to the executor sub-project direct
 ```bash
 cd invoice-executor
 ./gradlew bootRun
+cd ..
 ```
 *This service will bind to port `8081` and immediately start listening for events from the Kafka Topic.*
 
@@ -71,6 +73,6 @@ curl -X POST "http://localhost:8080/api/v1/schedules/run?action=SEND_INVOICE&dat
 
 **Expected Terminal Log Output:**
 * **Scheduler Terminal (8080)** will show successful broker dispatch logs:
-  `========== [PRODUCER] Success push Partner ID X to Kafka Topic ==========`
+  `[PRODUCER] Success push Partner ID X to Kafka Topic.`
 * **Executor Terminal (8081)** will automatically intercept the event from the broker and persist the document into MongoDB:
   `[MONGO] Success writing audit trail with Document ID: [Auto-Generated-UUID]`
